@@ -13,7 +13,7 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - Pillar
   - 
   - 
   - 
@@ -40,4 +40,13 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Pillar
+    uniqueID: 3764012207
+    locked: 0
+  - name: Stick
+    uniqueID: 329536013
+    locked: 0
+  - name: Player
+    uniqueID: 1667693557
     locked: 0
