@@ -21,14 +21,15 @@ public class Stick : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(GetRayOrigin(), new Vector2(0, -1f), 0.5f, collisionMask);
         Debug.DrawRay(GetRayOrigin(), -Vector2.up, Color.blue);
 
+        float endOfStickXPosition = transform.localScale.y + transform.position.x;
+
         if (hit)
         {
-            gameManager.MoveToNextPillar();
-            print("Collision");
+            gameManager.MoveToNextPillar(false, endOfStickXPosition);
         }
         else
         {
-            print("Lost");
+            gameManager.MoveToNextPillar(true, endOfStickXPosition);
         }
     }
 
@@ -43,6 +44,9 @@ public class Stick : MonoBehaviour
         return new Vector2(x, y);
     }
 
-
+    private void OnBecameInvisible()
+    {
+        Destroy(gameObject);
+    }
 
 }

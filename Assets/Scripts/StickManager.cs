@@ -7,7 +7,7 @@ public class StickManager : MonoBehaviour
 {
 
     public GameObject stickPrefab;
-    GameManager gameGenerator;
+    GameManager gameManager;
     LevelGenerator levelGenerator;
     GameObject stick;
 
@@ -20,18 +20,19 @@ public class StickManager : MonoBehaviour
 
     bool hasRotated = false;
     bool canSpawnStick = true;
+    bool canGetMouseUp = true;
 
     void Start()
     {
         levelGenerator = FindObjectOfType<LevelGenerator>();
-        gameGenerator = FindObjectOfType<GameManager>();
+        gameManager = FindObjectOfType<GameManager>();
         time = timePeriod;
 
         if (!stickPrefab)
         {
             Debug.LogError("Stick is missing from Stick Manager");
         }
-        if (!gameGenerator)
+        if (!gameManager)
         {
             Debug.LogWarning("Level Generator hasn't been found by Stick Manager");
         }
@@ -43,43 +44,56 @@ public class StickManager : MonoBehaviour
     
     void Update()
     {
-        ManageStickSpawn();
+        ManageStickInput();
     }
 
-    void ManageStickSpawn()
+    void ManageStickInput()
     {
         if (Input.GetMouseButtonDown(0) && canSpawnStick)
         {
             SpawnStick();
         }
-        if (Input.GetMouseButtonUp(0) && !hasRotated)
+        else if(Input.GetMouseButtonDown(0))
+        {
+            canGetMouseUp = false;
+        }
+        if (Input.GetMouseButtonUp(0) && !hasRotated && canGetMouseUp)
         {
             drawingStick = false;
             StartCoroutine(RotateStick(timeToRotate));
         }
-
-        if (drawingStick)
+        else if(Input.GetMouseButtonUp(0) && !hasRotated)
         {
-            time -= Time.deltaTime;
-            if (time <= 0)
-            {
-                DrawStick();
-                time = timePeriod;
-            }
+            canGetMouseUp = true;
         }
     }
 
-    void DrawStick()
+    void SpawnStick()
     {
-        float xScale = stick.transform.localScale.x;
-        float yScale = stick.transform.localScale.y + distancePerPeriod;
-        stick.transform.localScale = new Vector3(xScale, yScale, 1);
+        stick = Instantiate(stickPrefab, GetStickSpawnPosition(gameManager.pillarIndex), Quaternion.identity);
+        drawingStick = true;
+        canSpawnStick = false;
+
+        StartCoroutine(DrawStick());
+    }
+
+    IEnumerator DrawStick()
+    {
+        while (drawingStick)
+        {
+            float xScale = stick.transform.localScale.x;
+            float yScale = stick.transform.localScale.y + distancePerPeriod;
+            stick.transform.localScale = new Vector3(xScale, yScale, 1);
+
+            yield return new WaitForSeconds(timePeriod);
+        }
     }
 
     IEnumerator RotateStick(float timeToMove)
     {
         float currentRotation = 0;
         float elapsedTime = 0f;
+
         while(currentRotation < 90 && elapsedTime < timeToMove)
         {
             elapsedTime += Time.deltaTime;
@@ -99,14 +113,7 @@ public class StickManager : MonoBehaviour
         stick.GetComponent<Stick>()?.CheckForCollision();
     }
 
-    void SpawnStick()
-    {
-        stick = Instantiate(stickPrefab, GetStickSpawnPosition(gameGenerator.pillarIndex), Quaternion.identity);
-        drawingStick = true;
-        canSpawnStick = false;
-    }
-
-    Vector3 GetStickSpawnPosition(int index)
+    Vector3 GetStickSpawnPosition(int index) // Origin of the stick is the top-right corner of the pillar
     {
         GameObject pillar = levelGenerator.pillars[index];
 
@@ -126,6 +133,12 @@ public class StickManager : MonoBehaviour
         float yStick = yPos + (pillarHeight / 2);
 
         return new Vector3(xStick, yStick, 0);
+    }
+
+    public void ResetStick() // Reset parameters to prepare for the next pillar
+    {
+        hasRotated = false;
+        canSpawnStick = true;
     }
 
 }

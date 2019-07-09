@@ -26,15 +26,21 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public void MoveToNextPillar()
+    public void MoveToNextPillar(bool hasDied, float endOfStickXPosition)
     {
         pillarIndex++;
 
-        float xNewPillar = levelGenerator.pillars[pillarIndex].transform.position.x;
-        StartCoroutine(player.MovePlayer(xNewPillar));
+        if (hasDied)
+        {
+            StartCoroutine(player.MovePlayer(endOfStickXPosition, true));
+        }
+        else
+        {
+            float destinationX = levelGenerator.pillars[pillarIndex].transform.position.x;
+            StartCoroutine(player.MovePlayer(destinationX, false));
 
-        levelGenerator.GenerateNewPillar();
-
+            levelGenerator.GenerateNewPillar();
+        }
     }
 
 }

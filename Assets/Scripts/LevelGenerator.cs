@@ -34,7 +34,6 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
-
     public void GenerateNewPillar()
     {
         Vector3 pillarPosition = new Vector3(currentX, yPosition, 0);
@@ -49,8 +48,6 @@ public class LevelGenerator : MonoBehaviour
         currentX += GetRandomSpacing();
         currentX += pillarXSize;
         pillarNumber++;
-
-
     }
 
     float GetRandomPillarSize()
