@@ -8,7 +8,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject pillarParent;
 
     float minXSize = 0.5f;
-    float maxXSize = 1.3f;
+    float maxXSize = 1.1f;
 
     float minSpacing = 2f;
     float maxSpacing = 5f;

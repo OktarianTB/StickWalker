@@ -6,29 +6,61 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
 
-    float timeToMoveOneUnit = 5f;
     LevelGenerator levelGenerator;
-    StickManager stickManager; 
+    StickManager stickManager;
+    GameManager gameManager;
+    Animator animator;
+
+    public AudioClip successClip;
+    public AudioClip uhClip;
+    float timeToMoveOneUnit = 5f;
+    float volumeSuccess = 0.7f;
+    float volumeUh = 1.2f;
 
     private void Start()
     {
         levelGenerator = FindObjectOfType<LevelGenerator>();
         stickManager = FindObjectOfType<StickManager>();
+        gameManager = FindObjectOfType<GameManager>();
+        animator = GetComponent<Animator>();
 
         if (levelGenerator)
         {
             float startPositionX = levelGenerator.pillars[0].transform.position.x;
             transform.position = new Vector3(startPositionX, transform.position.y, 0f);
         }
+        else
+        {
+            Debug.LogWarning("Level Generator can't be found by Player");
+        }
 
         if (!stickManager)
         {
-            Debug.LogWarning("Stick Manager is missing from Player");
+            Debug.LogWarning("Stick Manager can't be found by Player");
+        }
+
+        if (!animator)
+        {
+            Debug.LogWarning("Animator component is missing from Player");
+        }
+        if (!gameManager)
+        {
+            Debug.LogWarning("Game Manager can't be found by Player");
+        }
+        if (!successClip)
+        {
+            Debug.LogWarning("Success clip is missing from Player");
+        }
+        if (!uhClip)
+        {
+            Debug.LogWarning("Uh clip is missing from Player");
         }
     }
 
     public IEnumerator MovePlayer(float xDestination, bool hasLost)
     {
+        animator.SetBool("isMoving", true);
+
         float elapsedTime = 0f;
         float timeToMove = (xDestination - transform.position.x) / timeToMoveOneUnit;
 
@@ -40,15 +72,19 @@ public class Player : MonoBehaviour
             elapsedTime += Time.deltaTime;
 
             float t = Mathf.Clamp(elapsedTime / timeToMove, 0f, 1f);
-            t = t * t * t * (t * (t * 6 - 15) + 10);
+            t = t * t * t * (t * (t * 6 - 15) + 10); // smoother movement
 
             transform.position = Vector3.Lerp(startPosition, destination, t);
 
             yield return null;
         }
 
+        animator.SetBool("isMoving", false);
+
         if (!hasLost)
         {
+            AudioSource.PlayClipAtPoint(successClip, transform.position, volumeSuccess);
+            gameManager.UpdateScore();
             stickManager.ResetStick();
         }
         else
@@ -60,6 +96,8 @@ public class Player : MonoBehaviour
 
     private IEnumerator PlayerFall()
     {
+        AudioSource.PlayClipAtPoint(uhClip, transform.position, volumeUh);
+
         float elapsedTime = 0f;
         float timeToMove = 1f;
 
@@ -77,5 +115,7 @@ public class Player : MonoBehaviour
 
             yield return null;
         }
+        gameManager.ManageGameOver();
     }
+
 }

@@ -95,3 +95,4 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 256
+  impactClip: {fileID: 8300000, guid: 66ac6bd20390f944085340c5c6e61232, type: 3}

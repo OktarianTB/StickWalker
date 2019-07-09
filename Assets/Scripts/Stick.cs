@@ -5,7 +5,10 @@ using UnityEngine;
 public class Stick : MonoBehaviour
 {
     public LayerMask collisionMask;
+    public AudioClip impactClip;
     GameManager gameManager;
+
+    float volume = 0.7f;
 
     void Start()
     {
@@ -13,6 +16,10 @@ public class Stick : MonoBehaviour
         if (!gameManager)
         {
             Debug.LogWarning("Stick Manager can't be found by Stick script");
+        }
+        if (!impactClip)
+        {
+            Debug.LogWarning("Impact clip is missing from Stick Manager");
         }
     }
     
@@ -25,11 +32,13 @@ public class Stick : MonoBehaviour
 
         if (hit)
         {
+            AudioSource.PlayClipAtPoint(impactClip, transform.position, volume);
             gameManager.MoveToNextPillar(false, endOfStickXPosition);
         }
         else
         {
             gameManager.MoveToNextPillar(true, endOfStickXPosition);
+            gameManager.gameIsOver = true;
         }
     }
 

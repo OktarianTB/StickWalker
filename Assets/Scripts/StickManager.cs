@@ -13,8 +13,7 @@ public class StickManager : MonoBehaviour
 
     bool drawingStick = false;
     float timePeriod = 0.03f;
-    float time;
-    float distancePerPeriod = 0.1f;
+    float distancePerPeriod = 0.13f;
 
     float timeToRotate = 0.8f;
 
@@ -26,7 +25,6 @@ public class StickManager : MonoBehaviour
     {
         levelGenerator = FindObjectOfType<LevelGenerator>();
         gameManager = FindObjectOfType<GameManager>();
-        time = timePeriod;
 
         if (!stickPrefab)
         {
@@ -44,10 +42,13 @@ public class StickManager : MonoBehaviour
     
     void Update()
     {
-        ManageStickInput();
+        if (!gameManager.gameIsPaused)
+        {
+            ManageStickInput();
+        }
     }
 
-    void ManageStickInput()
+    private void ManageStickInput()
     {
         if (Input.GetMouseButtonDown(0) && canSpawnStick)
         {
@@ -68,7 +69,7 @@ public class StickManager : MonoBehaviour
         }
     }
 
-    void SpawnStick()
+    private void SpawnStick()
     {
         stick = Instantiate(stickPrefab, GetStickSpawnPosition(gameManager.pillarIndex), Quaternion.identity);
         drawingStick = true;
