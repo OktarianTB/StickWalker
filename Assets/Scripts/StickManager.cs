@@ -14,10 +14,11 @@ public class StickManager : MonoBehaviour
     bool drawingStick = false;
     float timePeriod = 0.03f;
     float distancePerPeriod = 0.13f;
+    float maxStickHeight;
 
     float timeToRotate = 0.8f;
-
     bool hasRotated = false;
+
     bool canSpawnStick = true;
     bool canGetMouseUp = true;
 
@@ -25,6 +26,8 @@ public class StickManager : MonoBehaviour
     {
         levelGenerator = FindObjectOfType<LevelGenerator>();
         gameManager = FindObjectOfType<GameManager>();
+
+        maxStickHeight = GetMaxStickHeight();
 
         if (!stickPrefab)
         {
@@ -52,7 +55,7 @@ public class StickManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && canSpawnStick)
         {
-            SpawnStick();
+            InstantiateStick();
         }
         else if(Input.GetMouseButtonDown(0))
         {
@@ -69,22 +72,27 @@ public class StickManager : MonoBehaviour
         }
     }
 
-    private void SpawnStick()
+    private void InstantiateStick()
     {
         stick = Instantiate(stickPrefab, GetStickSpawnPosition(gameManager.pillarIndex), Quaternion.identity);
         drawingStick = true;
         canSpawnStick = false;
 
-        StartCoroutine(DrawStick());
+        StartCoroutine(StretchStick());
     }
 
-    IEnumerator DrawStick()
+    IEnumerator StretchStick()
     {
         while (drawingStick)
         {
             float xScale = stick.transform.localScale.x;
             float yScale = stick.transform.localScale.y + distancePerPeriod;
             stick.transform.localScale = new Vector3(xScale, yScale, 1);
+
+            if(yScale > maxStickHeight)
+            {
+                break;
+            }
 
             yield return new WaitForSeconds(timePeriod);
         }
@@ -138,8 +146,15 @@ public class StickManager : MonoBehaviour
 
     public void ResetStick() // Reset parameters to prepare for the next pillar
     {
+        Destroy(stick);
         hasRotated = false;
         canSpawnStick = true;
+    }
+
+    float GetMaxStickHeight()
+    {
+        float height = Camera.main.orthographicSize;
+        return height + 2f;
     }
 
 }

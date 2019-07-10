@@ -23,7 +23,7 @@ public class Stick : MonoBehaviour
         }
     }
     
-    public void CheckForCollision()
+    public void CheckForCollision() // Checks whether the end of the stick is on the pillar
     {
         RaycastHit2D hit = Physics2D.Raycast(GetRayOrigin(), new Vector2(0, -1f), 0.5f, collisionMask);
         Debug.DrawRay(GetRayOrigin(), -Vector2.up, Color.blue);

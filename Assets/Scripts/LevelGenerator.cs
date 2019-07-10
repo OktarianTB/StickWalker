@@ -50,7 +50,7 @@ public class LevelGenerator : MonoBehaviour
         pillarNumber++;
     }
 
-    float GetRandomPillarSize()
+    float GetRandomPillarSize() // returns the width of the pillar
     {
         float randomXSize = Random.Range(minXSize, maxXSize);
         return randomXSize;
